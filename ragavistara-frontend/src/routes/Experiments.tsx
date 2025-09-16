@@ -1,0 +1,10 @@
+export default function Experiments() {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-10">
+      <h2 className="text-2xl font-semibold mb-4">Experiments</h2>
+      <p className="text-neutral-300">Batch runs and metrics will go here.</p>
+    </div>
+  )
+}
+
+

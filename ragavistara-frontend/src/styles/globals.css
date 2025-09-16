@@ -1,0 +1,76 @@
+@tailwind base;
+
+@layer base {
+  :root {
+    --brand: #7c3aed;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-neutral-950 text-neutral-100 antialiased font-sans;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    background-color: #0a0a0b;
+    color: #e5e7eb;
+  }
+
+  .glass {
+    backdrop-filter: saturate(180%) blur(12px);
+    background: rgba(24, 24, 27, 0.6);
+  }
+
+  .btn-brand {
+    @apply inline-flex items-center justify-center rounded-xl bg-brand text-white font-medium px-4 py-2 shadow-soft hover:brightness-110 transition;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 16px; border-radius: 12px; font-weight: 600;
+    background: var(--brand); color: #fff; border: none; cursor: pointer;
+    box-shadow: 0 10px 30px -12px rgba(124,58,237,0.6);
+    transition: filter .2s ease, transform .05s ease;
+  }
+  .btn-brand:active { transform: translateY(1px); }
+  .btn-brand:hover { filter: brightness(1.08); }
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-xl border border-white/10 px-4 py-2 text-white hover:bg-white/5 transition;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 10px 16px; border-radius: 12px; color: #fff;
+    border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.02);
+    transition: background .2s ease, transform .05s ease;
+  }
+  .btn-outline:active { transform: translateY(1px); }
+  .btn-outline:hover { background: rgba(255,255,255,0.06); }
+  .panel {
+    @apply rounded-2xl p-8 md:p-10 shadow-soft border border-white/10;
+    background: linear-gradient(180deg, rgba(124,58,237,0.12), rgba(124,58,237,0.06));
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 18px; padding: 28px;
+    box-shadow: 0 10px 30px -12px rgba(0,0,0,0.45);
+  }
+
+  a {
+    @apply text-neutral-200 hover:text-white;
+    color: #d1d5db; text-decoration: none;
+  }
+  a:hover { color: #fff; }
+  h1,h2,h3 { color: #f3f4f6; margin: 0 0 16px; }
+  p { color: #cbd5e1; }
+  input, button, select, textarea {
+    @apply outline-none focus:ring-2 focus:ring-brand/60 focus:ring-offset-0;
+    outline: none;
+  }
+
+  /* Fallback non-Tailwind utility rules */
+  .hdr { display:flex; align-items:center; justify-content:space-between; padding:20px 32px; }
+  .nv { display:flex; gap:28px; font-size:15px; }
+  .hero-grid { display:grid; grid-template-columns: 1fr; gap: 32px; }
+  @media (min-width: 768px) { .hero-grid { grid-template-columns: 1fr 1fr; } }
+  .field { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 12px 16px; color: #e5e7eb; }
+  .chip { display:inline-flex; align-items:center; justify-content:center; padding:10px 16px; border-radius:14px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); font-size:15px; color:#e5e7eb; }
+  .chip + .chip { margin-left: 16px; }
+  .stack > * + * { margin-top: 20px; }
+  .row { display:flex; align-items:center; gap: 16px; flex-wrap: wrap; }
+  .grid3 { display:grid; grid-template-columns: repeat(3, minmax(240px,1fr)); gap: 20px; }
+  /* add comfortable spacing between direct children in panels */
+  .panel > * + * { margin-top: 20px; }
+}

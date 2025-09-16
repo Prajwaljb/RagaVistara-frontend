@@ -1,0 +1,4 @@
+demucs
+flask
+flask-cors
+werkzeug
