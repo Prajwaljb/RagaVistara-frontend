@@ -2,3 +2,4 @@ demucs
 flask
 flask-cors
 werkzeug
+soundfile

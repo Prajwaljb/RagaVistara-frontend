@@ -5,6 +5,7 @@ import ErrorBoundary from '@/components/ui/ErrorBoundary'
 
 const Home = lazy(() => import('./routes/Home'))
 const Analyze = lazy(() => import('./routes/Analyze'))
+const Karaoke = lazy(() => import('./routes/Karaoke'))
 const Compare = lazy(() => import('./routes/Compare'))
 const History = lazy(() => import('./routes/History'))
 const Datasets = lazy(() => import('./routes/Datasets'))
@@ -21,6 +22,7 @@ function App() {
             <NavLink to="/" className="text-xl font-semibold">Raga Vistara</NavLink>
             <nav className="nv">
               <NavLink to="/analyze">Analyze</NavLink>
+              <NavLink to="/karaoke">Karaoke</NavLink>
               <NavLink to="/compare">Compare</NavLink>
               <NavLink to="/history">History</NavLink>
               <NavLink to="/datasets">Datasets</NavLink>
@@ -40,6 +42,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/analyze" element={<Analyze />} />
+                <Route path="/karaoke" element={<Karaoke />} />
                 <Route path="/compare" element={<Compare />} />
                 <Route path="/history" element={<History />} />
                 <Route path="/datasets" element={<Datasets />} />

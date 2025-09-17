@@ -8,7 +8,7 @@ describe('UploadCard', () => {
     const user = userEvent.setup()
     const onSelect = vi.fn()
     render(<UploadCard file={null} onSelect={onSelect} />)
-    expect(screen.getByText(/Drop audio here/i)).toBeInTheDocument()
+    expect(screen.getByText(/Drop audio here/i)).toBeTruthy()
     // Simulate set file then clear
     render(<UploadCard file={new File(['a'], 'a.wav', { type: 'audio/wav' })} onSelect={onSelect} />)
     await user.click(screen.getByText(/Clear/i))

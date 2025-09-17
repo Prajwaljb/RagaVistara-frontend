@@ -21,12 +21,12 @@ export default function Analyze() {
   const createJob = useJobs((s) => s.createJob)
   const fetchJob = useJobs((s) => s.fetchJob)
   const schema = useMemo(() => z.object({
-    modelPreset: z.string().default('RagaNet v1'),
-    raga: z.boolean().default(true),
-    tonic: z.boolean().default(true),
-    pitch: z.boolean().default(true),
-    tempo: z.boolean().default(true),
-    separation: z.boolean().default(true),
+    modelPreset: z.string(),
+    raga: z.boolean(),
+    tonic: z.boolean(),
+    pitch: z.boolean(),
+    tempo: z.boolean(),
+    separation: z.boolean(),
   }), [])
   const { register, handleSubmit, watch } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -141,6 +141,23 @@ export default function Analyze() {
                 <Spectrogram src={jobs[jobId]!.result!.stems![0].url} />
               )}
               <TempoChart bpm={jobs[jobId]!.result!.tempoBpm} />
+              {jobs[jobId]!.result!.stems && (
+                <div className="panel">
+                  <h3 className="text-lg font-medium mb-2">Separated Audio (Instrumental for Karaoke)</h3>
+                  {jobs[jobId]!.result!.stems!.map((stem) => (
+                    <div key={stem.name} className="flex items-center gap-2 mb-2">
+                      <span className="text-sm">{stem.name}</span>
+                      <a
+                        href={`http://localhost:8000${stem.url}`}
+                        download
+                        className="btn-brand text-xs px-2 py-1 rounded"
+                      >
+                        Download
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           )}
         </div>
