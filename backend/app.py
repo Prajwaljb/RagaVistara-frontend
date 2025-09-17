@@ -42,7 +42,7 @@ def extract_instrumental(file_path, output_dir):
     sources = sources[0]  # remove batch dim, shape [4, 2, time]
 
     # Combine drums, bass, other sources for instrumental (no vocals), average over channels
-    instrumental = (sources[0] + sources[2] + sources[3]).mean(dim=0)
+    instrumental = (sources[0] + sources[1] + sources[2]).mean(dim=0)
 
     # Save instrumental audio
     os.makedirs(output_dir, exist_ok=True)
