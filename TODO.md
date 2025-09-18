@@ -1,7 +1,6 @@
 - [x] Add download button for instrumental output in Analyze.tsx
 - [x] Fix Demucs torchaudio backend error by using --two-stems=vocals and TORCH_AUDIO_BACKEND=soundfile
 - [x] Update backend code to use compatible Demucs options
-- [ ] Install soundfile: pip install soundfile
-- [ ] Restart backend after installing soundfile
-- [ ] Test the upload and processing flow
-- [ ] Verify the instrumental file is downloadable
+- [x] Enable GPU usage for Demucs processing and TensorFlow (crepe) analysis
+- [x] Test the upload and processing flow
+- [x] Verify the instrumental file is downloadable

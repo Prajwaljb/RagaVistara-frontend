@@ -26,11 +26,10 @@ export default function Analyze() {
     tonic: z.boolean(),
     pitch: z.boolean(),
     tempo: z.boolean(),
-    separation: z.boolean(),
   }), [])
   const { register, handleSubmit, watch } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { modelPreset: 'RagaNet v1', raga: true, tonic: true, pitch: true, tempo: true, separation: true },
+    defaultValues: { modelPreset: 'RagaNet v1', raga: true, tonic: true, pitch: true, tempo: true },
   })
 
   useEffect(() => {
@@ -52,7 +51,7 @@ export default function Analyze() {
 
   async function runAnalysis() {
     if (!file) return
-    const opts = watch()
+    const opts = { ...watch(), separation: false }
     const id = await createJob(file, opts)
     setJobId(id)
   }
@@ -94,7 +93,8 @@ export default function Analyze() {
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('raga')} /> Raga ID</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('tonic')} /> Tonic/Pitch</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('tempo')} /> Tempo</label>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('separation')} /> Separation</label>
+            {/* Removed separation option from Analyze */}
+            {/* <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('separation')} /> Separation</label> */}
             <div className="mt-4">
               <button
                 type="submit"
@@ -141,23 +141,6 @@ export default function Analyze() {
                 <Spectrogram src={jobs[jobId]!.result!.stems![0].url} />
               )}
               <TempoChart bpm={jobs[jobId]!.result!.tempoBpm} />
-              {jobs[jobId]!.result!.stems && (
-                <div className="panel">
-                  <h3 className="text-lg font-medium mb-2">Separated Audio (Instrumental for Karaoke)</h3>
-                  {jobs[jobId]!.result!.stems!.map((stem) => (
-                    <div key={stem.name} className="flex items-center gap-2 mb-2">
-                      <span className="text-sm">{stem.name}</span>
-                      <a
-                        href={`http://localhost:8000${stem.url}`}
-                        download
-                        className="btn-brand text-xs px-2 py-1 rounded"
-                      >
-                        Download
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              )}
             </>
           )}
         </div>
