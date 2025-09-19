@@ -26,10 +26,11 @@ export default function Analyze() {
     tonic: z.boolean(),
     pitch: z.boolean(),
     tempo: z.boolean(),
+    swara_pdf: z.boolean(),
   }), [])
   const { register, handleSubmit, watch } = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
-    defaultValues: { modelPreset: 'RagaNet v1', raga: true, tonic: true, pitch: true, tempo: true },
+    defaultValues: { modelPreset: 'RagaNet v1', raga: true, tonic: true, pitch: true, tempo: true, swara_pdf: true },
   })
 
   useEffect(() => {
@@ -93,6 +94,7 @@ export default function Analyze() {
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('raga')} /> Raga ID</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('tonic')} /> Tonic/Pitch</label>
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('tempo')} /> Tempo</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('swara_pdf')} /> Swara Notation PDF</label>
             {/* Removed separation option from Analyze */}
             {/* <label className="flex items-center gap-2 text-sm"><input type="checkbox" defaultChecked {...register('separation')} /> Separation</label> */}
             <div className="mt-4">
@@ -132,6 +134,33 @@ export default function Analyze() {
               )}
               {jobs[jobId]!.result!.swaraHistogram && (
                 <SwaraHistogram data={jobs[jobId]!.result!.swaraHistogram!} />
+              )}
+              {jobs[jobId]!.result!.swaraPdfUrl && (
+                <div className="mt-4">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const url = new URL(jobs[jobId]!.result!.swaraPdfUrl, import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').toString()
+                        const response = await fetch(url)
+                        if (!response.ok) throw new Error('Network response was not ok')
+                        const blob = await response.blob()
+                        const downloadUrl = window.URL.createObjectURL(blob)
+                        const a = document.createElement('a')
+                        a.href = downloadUrl
+                        a.download = 'swaras_notation.pdf'
+                        document.body.appendChild(a)
+                        a.click()
+                        a.remove()
+                        window.URL.revokeObjectURL(downloadUrl)
+                      } catch (error) {
+                        alert('Failed to download PDF: ' + error)
+                      }
+                    }}
+                    className="btn-brand px-4 py-2 rounded"
+                  >
+                    Download Swara Notation PDF
+                  </button>
+                </div>
               )}
               {/* Demo audio: if stems exist, use first stem URL; otherwise omit waveform */}
               {jobs[jobId]!.result!.stems?.[0] && (

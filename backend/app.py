@@ -37,6 +37,15 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 logger = logging.getLogger(__name__)
 jobs = {}
 
+# --- Map MIDI to Indian swaras ---
+def freq_to_swara(freq):
+    if freq <= 0:
+        return None
+    midi = int(round(69 + 12 * np.log2(freq / 440.0)))
+    swara_index = (midi - 60) % 12
+    mapping = {0:'Sa', 2:'Re', 4:'Ga', 5:'Ma', 7:'Pa', 9:'Dha', 11:'Ni'}
+    return mapping.get(swara_index, None)
+
 # Removed combine_stems_to_instrumental as we will use Demucs Python API for separation
 
 def extract_instrumental(file_path, output_dir):
@@ -102,7 +111,7 @@ def process_job(job_id, file_path, options):
         else:
             logger.warning(f"Instrumental file not found for job {job_id} at {instrumental_path}")
 
-    analysis_needed = any(options.get(k) for k in ['raga', 'tonic', 'pitch', 'tempo'])
+    analysis_needed = any(options.get(k) for k in ['raga', 'tonic', 'pitch', 'tempo', 'swara_pdf'])
     if analysis_needed:
         jobs[job_id]['progress'] = 0.5
         try:
@@ -160,6 +169,57 @@ def process_job(job_id, file_path, options):
             if options.get('raga'):
                 result['topRaga'] = {'name': 'Raga Yaman', 'confidence': 0.85}
                 result['top3'] = [{'name': 'Raga Yaman', 'confidence': 0.85}, {'name': 'Raga Bhairav', 'confidence': 0.75}, {'name': 'Raga Darbari', 'confidence': 0.65}]
+
+            if options.get('swara_pdf'):
+                # --- CREPE pitch detection ---
+                time_crepe, frequency, confidence, _ = crepe.predict(y, sr, viterbi=True)
+
+                # --- Filter by confidence threshold for better accuracy ---
+                conf_threshold = 0.85
+                filtered_notes = [(t, f) for t, f, c in zip(time_crepe, frequency, confidence) if c >= conf_threshold]
+
+                # --- Map to swaras and timestamps ---
+                notes_with_time = []
+                for t, f in filtered_notes:
+                    swara = freq_to_swara(f)
+                    if swara:
+                        notes_with_time.append((round(t, 2), swara))
+
+                # Debug log notes_with_time content
+                logger.info(f"Notes with time sample: {notes_with_time[:10]}")
+
+                # --- Create PDF ---
+                from fpdf import FPDF
+                pdf = FPDF()
+                pdf.add_page()
+                pdf.set_font("Arial", size=12)
+
+                # Reduce frames to avoid too minute details, e.g., show every 0.5 seconds or more
+                last_t = -1.0
+                for t, s in notes_with_time:
+                    if last_t >= 0 and (t - last_t) < 0.5:
+                        continue
+                    last_t = t
+                    minutes = int(t // 60)
+                    seconds = t % 60
+                    timestamp_str = f"{minutes}:{seconds:04.1f}"
+                    pdf.cell(0, 8, f"{timestamp_str} - {s}", ln=True)
+
+                # Ensure output_dir is defined
+                output_dir = os.path.join(OUTPUT_FOLDER, job_id)
+                os.makedirs(output_dir, exist_ok=True)
+
+                import time
+                timestamp = int(time.time())
+                pdf_filename = f'swaras_notation_{timestamp}.pdf'
+                pdf_file = os.path.join(output_dir, pdf_filename)
+                logger.info(f"Generating PDF at: {pdf_file}")
+                pdf.output(pdf_file)
+                logger.info(f"PDF generation completed: {os.path.exists(pdf_file)}")
+
+                # Add to result with cache buster query param
+                rel_path = os.path.relpath(pdf_file, OUTPUT_FOLDER)
+                result['swaraPdfUrl'] = f'/outputs/{rel_path.replace(os.sep, "/")}?t={timestamp}'
 
         except Exception as e:
             logger.error(f"Analysis failed for job {job_id}: {e}")
@@ -221,7 +281,13 @@ def delete_job(job_id):
 
 @app.route('/outputs/<path:filename>')
 def serve_output(filename):
-    return send_from_directory(OUTPUT_FOLDER, filename)
+    import os
+    file_path = os.path.join(OUTPUT_FOLDER, filename)
+    logger.info(f"Serving output file: {filename}, resolved path: {file_path}, exists: {os.path.exists(file_path)}")
+    response = send_from_directory(OUTPUT_FOLDER, filename)
+    if filename.endswith('.pdf'):
+        response.headers['Content-Disposition'] = 'attachment; filename=' + filename.split('/')[-1]
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True, port=8000)

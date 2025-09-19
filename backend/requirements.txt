@@ -5,3 +5,4 @@ werkzeug
 soundfile
 librosa
 crepe
+fpdf

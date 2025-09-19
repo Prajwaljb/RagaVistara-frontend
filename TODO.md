@@ -4,3 +4,4 @@
 - [x] Enable GPU usage for Demucs processing and TensorFlow (crepe) analysis
 - [x] Test the upload and processing flow
 - [x] Verify the instrumental file is downloadable
+- [x] Implement swara notation PDF feature in backend and frontend

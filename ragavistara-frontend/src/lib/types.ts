@@ -6,6 +6,7 @@ export interface AnalyzeOptions {
   pitch: boolean
   tempo: boolean
   separation: boolean
+  swara_pdf: boolean
   modelPreset?: string
 }
 
@@ -23,6 +24,7 @@ export interface JobResult {
   pitchContour?: PitchPoint[]
   swaraHistogram?: SwaraBin[]
   stems?: Stem[]
+  swaraPdfUrl?: string
 }
 
 export interface Job {
